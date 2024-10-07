@@ -261,6 +261,12 @@ abstract class PdoDriver extends DatabaseDriver
                 // Extract host and port or socket from host option
                 $this->setHostPortSocket(5432);
 
+                // PostgreSQL (in difference to MariaDB and MySQL) does not work with
+                // IPv6 addresses enclosed in square brackets, so we simply remove them here.
+                if (isset($this->options['host']) && substr($this->options['host'], 0, 1) === '[' && substr($this->options['host'], -1) === ']') {
+                    $this->options['host'] = trim($this->options['host'], '[]');
+                }
+
                 if ($this->options['socket'] !== null) {
                     $format = 'pgsql:host=#SOCKET#;dbname=#DBNAME#';
                 } else {
